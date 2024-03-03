@@ -1,4 +1,7 @@
 <template>
+  <div>
+    <button class="buttonn" @click="goFullScreen">Go Full Screen</button>
+  </div>
   <section>
     <div class="video-container" :style="containerStyle">
       <img
@@ -29,11 +32,33 @@
 </template>
 
 <script setup>
-// const goFullScreen = () => {
-//   if (document.documentElement.requestFullscreen) {
-//     document.documentElement.requestFullscreen();
-//   }
-// };
+useHead({
+  title: "Booking",
+  display: "standalone",
+
+  meta: [
+    {
+      name: "mobile-web-app-capable",
+      content: "yes",
+    },
+    {
+      name: "apple-mobile-web-app-capable",
+      content: "yes",
+    },
+  ],
+});
+const goFullScreen = () => {
+  // Проверяем, поддерживает ли браузер API полноэкранного режима
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen();
+  } else if (document.documentElement.webkitRequestFullscreen) {
+    // Для Safari
+    document.documentElement.webkitRequestFullscreen();
+  } else if (document.documentElement.msRequestFullscreen) {
+    // Для IE11
+    document.documentElement.msRequestFullscreen();
+  }
+};
 useHead({
   title: "Booking",
   display: "standalone",
@@ -89,6 +114,10 @@ onUnmounted(() => {
 </script>
 
 <style>
+.buttonn {
+  position: relative;
+  z-index: 7;
+}
 section {
   height: 100dvh; /* Высота на весь экран */
   transition: height 0.2s linear;
