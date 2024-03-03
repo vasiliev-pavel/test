@@ -1,6 +1,9 @@
 <template>
   <div>
-    <button class="buttonn" @click="goFullScreen">Go Full Screen</button>
+    <!-- Кнопка для установки приложения, видима только если есть событие установки -->
+    <button v-if="installPrompt" @click="promptInstall" class="install-button">
+      Установить как приложение
+    </button>
   </div>
   <section>
     <div class="video-container" :style="containerStyle">
@@ -47,6 +50,46 @@ useHead({
     },
   ],
 });
+
+const installPrompt = ref(null);
+
+const setupEventListeners = () => {
+  const beforeInstallPromptHandler = (e) => {
+    // Предотвратить автоматическое отображение диалога
+    e.preventDefault();
+    // Сохранить событие, чтобы можно было запустить его позже
+    installPrompt.value = e;
+  };
+
+  window.addEventListener("beforeinstallprompt", beforeInstallPromptHandler);
+
+  onUnmounted(() => {
+    window.removeEventListener(
+      "beforeinstallprompt",
+      beforeInstallPromptHandler
+    );
+  });
+};
+onMounted(() => {
+  setupEventListeners();
+});
+
+const promptInstall = () => {
+  if (installPrompt.value) {
+    // Показать диалог установки
+    installPrompt.value.prompt();
+    // Определить, принял ли пользователь предложение об установке
+    installPrompt.value.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === "accepted") {
+        console.log("Пользователь принял предложение об установке");
+      } else {
+        console.log("Пользователь отклонил предложение об установке");
+      }
+      installPrompt.value = null; // Очистить сохранённое событие после выбора
+    });
+  }
+};
+
 const goFullScreen = () => {
   // Проверяем, поддерживает ли браузер API полноэкранного режима
   if (document.documentElement.requestFullscreen) {
@@ -59,22 +102,6 @@ const goFullScreen = () => {
     document.documentElement.msRequestFullscreen();
   }
 };
-useHead({
-  title: "Booking",
-  display: "standalone",
-
-  meta: [
-    {
-      name: "mobile-web-app-capable",
-      content: "yes",
-    },
-    {
-      name: "apple-mobile-web-app-capable",
-      content: "yes",
-    },
-  ],
-});
-
 const videoLoaded = ref(false);
 const blurAmount = ref(0);
 const darkenAmount = ref(0);
@@ -183,5 +210,11 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.install-button {
+  position: fixed; /* Или любой другой способ позиционирования */
+  z-index: 10; /* Убедитесь, что кнопка находится поверх других элементов */
+  bottom: 20px; /* Расположение кнопки */
+  right: 20px;
 }
 </style>
