@@ -13,25 +13,20 @@ webpush.setVapidDetails(
 );
 
 export default defineEventHandler(async (event) => {
-  try {
-    const tempData = await readBody(event);
-    const notification = JSON.stringify({
-      title: "Hello, Notifications123!",
-      options: {
-        body: `ID: ${Math.floor(Math.random() * 100)}`,
-      },
-    });
-    const options = {
-      TTL: 10000,
-      vapidDetails: vapidDetails,
-    };
-    // Отправка уведомления
-    await webpush.sendNotification(tempData, notification, options);
-    // console.log(subscription);
-    console.log("success");
-    return { success: true };
-  } catch (error) {
-    console.log(error.error);
-    return { success: false, error: error };
-  }
+  const tempData = await readBody(event);
+  const notification = JSON.stringify({
+    title: "Hello, Notifications123!",
+    options: {
+      body: `ID: ${Math.floor(Math.random() * 100)}`,
+    },
+  });
+  const options = {
+    TTL: 10000,
+    vapidDetails: vapidDetails,
+  };
+  // Отправка уведомления
+  await webpush.sendNotification(tempData, notification, options);
+  // console.log(subscription);
+  console.log("success");
+  return { success: true };
 });
