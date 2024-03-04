@@ -52,6 +52,9 @@ export default defineNuxtConfig({
       ],
     },
     workbox: {
+      globDirectory: "C:/Users/anilla/Desktop/testing/test/.nuxt/dev-sw-dist",
+      globIgnores: ["**/node_modules/**/*", "sw.js", "workbox-*.js"],
+
       navigateFallback: "/",
     },
     devOptions: {

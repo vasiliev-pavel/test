@@ -1,10 +1,9 @@
 <template>
-  <div>
-    <!-- Кнопка для установки приложения, видима только если есть событие установки -->
-    <button v-if="installPrompt" @click="promptInstall" class="install-button">
-      Установить как приложение
-    </button>
-  </div>
+  <!-- Кнопка для установки приложения, видима только если есть событие установки -->
+  <button v-if="installPrompt" @click="promptInstall" class="install-button">
+    Установить как приложение
+  </button>
+
   <section>
     <div class="video-container" :style="containerStyle">
       <img
@@ -50,6 +49,7 @@ useHead({
     },
   ],
 });
+const { $pwa } = useNuxtApp();
 
 const installPrompt = ref(null);
 
@@ -71,6 +71,7 @@ const setupEventListeners = () => {
   });
 };
 onMounted(() => {
+  if ($pwa.offlineReady) console.log("App ready to work offline", $pwa);
   setupEventListeners();
 });
 
@@ -122,12 +123,18 @@ const handleVideoLoad = () => {
 const handleScroll = () => {
   requestAnimationFrame(() => {
     const scrolled = window.scrollY;
-    const maxBlur = 10; // Максимальное значение блюра
-    blurAmount.value = Math.min(scrolled / 100, maxBlur);
+    const windowHeight = window.innerHeight; // Получаем высоту окна браузера
+    const threshold = windowHeight * 0.5; // Устанавливаем порог в 50% высоты окна
 
-    // Рассчитываем уровень затемнения
-    const maxDarken = 30; // Максимальное затемнение в процентах
-    darkenAmount.value = Math.min(scrolled / 10, maxDarken);
+    // Используем порог для расчёта процентов
+    const scrollPercentage = Math.min(scrolled / threshold, 1); // Гарантируем, что значение не превысит 1
+
+    const maxBlur = 20; // Максимальное значение блюра
+    const maxDarken = 0.2; // Максимальное затемнение в долях (20%)
+
+    // Применяем процент прокрутки для расчёта значений
+    blurAmount.value = maxBlur * scrollPercentage;
+    darkenAmount.value = maxDarken * scrollPercentage * 100; // Умножаем на 100, потому что --darken-amount ожидает проценты
   });
 };
 
@@ -149,9 +156,13 @@ section {
   height: 100dvh; /* Высота на весь экран */
   transition: height 0.2s linear;
 }
+
 .video-container {
+  display: flex; /* Используем Flexbox для центрирования содержимого */
+  justify-content: center; /* Центрируем содержимое по горизонтали */
+  align-items: center; /* Центрируем содержимое по вертикали */
   position: relative;
-  width: 100%;
+  width: 100%; /* Убедитесь, что контейнер занимает всю ширину */
   height: 100vh; /* Высота на весь экран */
   overflow: hidden;
 }
@@ -163,21 +174,21 @@ section {
   height: 100%;
   position: fixed;
   background: rgba(
-    0,
-    0,
-    0,
+    255,
+    255,
+    255,
     calc(var(--darken-amount, 0))
-  ); /* Используем переменную для затемнения */
+  ); /* Изменено на белый с использованием переменной для альфа-канала */
 
   z-index: 1; /* Убедитесь, что z-index такой, чтобы он был поверх видео, но под контентом */
 }
 
 .background-image,
 .background-video {
-  position: fixed;
-  top: 0;
-  left: 0;
-
+  position: fixed; /* Изменяем на absolute для корректного позиционирования */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Центрирование относительно точки */
   min-width: 100%;
   min-height: 100%;
   width: auto;
@@ -185,9 +196,9 @@ section {
   z-index: -100;
   background-size: cover;
   transition: 1s opacity;
-  object-fit: cover; /* Обеспечивает заполнение всей доступной области */
+  object-fit: cover; /* Заполняет контейнер, сохраняя пропорции */
+  object-position: center; /* Центрирует содержимое в контейнере */
 }
-
 .center-container {
   display: flex;
   justify-content: center;
@@ -197,19 +208,52 @@ section {
 .squares-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* Две колонки */
-  gap: 5rem; /* Отступы между квадратами */
+  gap: 2.5rem; /* Отступы между квадратами */
   justify-content: center; /* Центрирует квадраты по горизонтали */
   align-content: center; /* Добавлено для центрирования квадратов внутри контейнера, если он выше, чем нужно для одного ряда */
   z-index: 5;
 }
 
 .square {
-  width: 100px; /* Ширина квадрата */
-  height: 100px; /* Высота квадрата */
-  background-color: #ddd; /* Цвет фона квадрата */
+  padding: 8rem 5rem;
+  border-radius: 1.7rem;
+  background-color: #fafafa; /* Цвет фона квадрата */
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Медиазапрос для экранов меньше 768px */
+@media (max-width: 768px) {
+  .squares-container {
+    gap: 1.5rem; /* Уменьшаем отступ между квадратами */
+  }
+}
+
+/* Медиазапрос для экранов меньше 480px */
+@media (max-width: 428px) {
+  .squares-container {
+    gap: 2rem; /* Еще больше уменьшаем отступ между квадратами */
+  }
+}
+
+@media (max-width: 378px) {
+  .squares-container {
+    gap: 1.3rem; /* Еще больше уменьшаем отступ между квадратами */
+  }
+  .square {
+    padding: 7rem 5rem;
+  }
+}
+
+/* Медиазапрос для экранов меньше  320px */
+@media (max-width: 320px) {
+  .squares-container {
+    gap: 1rem; /* Еще больше уменьшаем отступ между квадратами */
+  }
+  .square {
+    padding: 6rem 4rem;
+  }
 }
 .install-button {
   position: fixed; /* Или любой другой способ позиционирования */
