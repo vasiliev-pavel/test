@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
       vapidDetails: vapidDetails,
     };
     // Отправка уведомления
-    await webpush.sendNotification(pushSubscription, notification, options);
+    await webpush.sendNotification(tempData, notification, options);
     // console.log(subscription);
     console.log("success");
     return { success: true };
