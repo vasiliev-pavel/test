@@ -7,7 +7,7 @@ const vapidDetails = {
 };
 
 webpush.setVapidDetails(
-  vapidDetails.subject,
+  "mailto:vasilievpavel795@gmail.com",
   vapidDetails.publicKey,
   vapidDetails.privateKey
 );
@@ -28,12 +28,12 @@ export default defineEventHandler(async (event) => {
       vapidDetails: vapidDetails,
     };
     // Отправка уведомления
-    await webpush.sendNotification(tempData, notification, options);
+    await webpush.sendNotification(pushSubscription, notification, options);
     // console.log(subscription);
     console.log("success");
     return { success: true };
   } catch (error) {
-    console.log(error.error);
+    console.error(error.error);
     return { success: false, error: error };
   }
 });
