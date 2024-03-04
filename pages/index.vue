@@ -74,6 +74,11 @@ const sendUserNotification = async () => {
 
   if (!activeSubscription) throw new Error("No active subscription found");
   console.log(activeSubscription);
+  const subscriptions = await registration.pushManager.getSubscription();
+  console.log("subscriptions", subscriptions);
+  console.log(subscription);
+  console.log(subscription.getKey("p256dh"));
+  console.log(subscription.getKey("auth"));
 
   await $fetch("/api/notification/sendNotification", {
     method: "POST",
