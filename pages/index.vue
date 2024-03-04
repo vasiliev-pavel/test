@@ -22,7 +22,7 @@ const VAPID_PUBLIC_KEY =
   "BCTduvE5Ivvju-WFQY7OCcaY4hm-loWHzfnnK14SQG2jFQti-owRbN0Ntpi-k-rNa9kb7M-SFqwGluvJA_-R97Q";
 const notificationPermission = ref("default"); // Инициализируем с 'default' или другим подходящим значением
 const deviceInfo = ref({});
-
+let subscription;
 watchEffect(async () => {
   //   if (user.value) {
   //     if (data.value) {
@@ -47,12 +47,11 @@ watchEffect(async () => {
         if (subscribed) {
           console.info("User is already subscribed.");
         } else {
-          const subscription = await registration.pushManager.subscribe({
+          subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY),
           });
           console.log("Subscription:", subscription);
-          console.log(deviceInfo.value);
           //   if (user.value) {
           //     await $fetch("/api/notification/addSubscription", {
           //       method: "POST",
@@ -92,6 +91,7 @@ const sendUserNotification = async () => {
   // const subscriptionDetails = JSON.parse(
   //   subscriptionData.value.data[0].endpoint
   // );
+
   // const notificationPayload = {
   //   endpoint: subscriptionDetails.endpoint,
   //   keys: {
@@ -111,7 +111,7 @@ const sendUserNotification = async () => {
 
   await $fetch("/api/notification/sendNotification", {
     method: "POST",
-    body: notificationPayload,
+    body: subscription,
   });
 };
 const requestNotificationPermission = async () => {
