@@ -14,9 +14,9 @@ webpush.setVapidDetails(
 
 export default defineEventHandler(async (event) => {
   try {
-    const pushSubscription = JSON.parse(YOUR_PUSH_SUBSCRIPTION_STRING);
-    console.log(pushSubscription);
     const tempData = await readBody(event);
+    const pushSubscription = JSON.parse(tempData);
+    console.log(pushSubscription);
     const notification = JSON.stringify({
       title: "Hello, Notifications123!",
       options: {
@@ -28,12 +28,11 @@ export default defineEventHandler(async (event) => {
       vapidDetails: vapidDetails,
     };
     // Отправка уведомления
-    await webpush.sendNotification(tempData, notification, options);
+    await webpush.sendNotification(pushSubscription, notification, options);
     // console.log(subscription);
     console.log("success");
     return { success: true };
   } catch (error) {
     console.error(error.error);
-    return { success: false, error: error };
   }
 });
