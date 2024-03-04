@@ -19,7 +19,7 @@
 import { urlB64ToUint8Array } from "~/composables/urlB64ToUint8Array";
 
 const VAPID_PUBLIC_KEY =
-  "BJYdOjJ_G5L_EkzXg5NZeCK6mIel3NZ1p6sw2SCUzUBvLhuKJG4PtIcJ958YK4WMTxitfbKGzM06mLP6wOjHm0c";
+  "BCGjvnQfPvGlT3-0GD_-VG7nANjo71PanCieb7HjztBhhMM2d8P7GCjSmaoHJTSEAdH1NCEvIvB1zt_C4OxuFEA";
 const notificationPermission = ref("default"); // Инициализируем с 'default' или другим подходящим значением
 const deviceInfo = ref({});
 let subscription;
