@@ -17,12 +17,42 @@
 
 <script setup>
 import { urlB64ToUint8Array } from "~/composables/urlB64ToUint8Array";
+import webpush from "web-push";
+const vapidDetails = {};
+onMounted(() => {
+  if (process.server)
+    vapidDetails = {
+      publicKey: process.env.VAPID_PUBLIC_KEY,
+      privateKey: process.env.VAPID_PRIVATE_KEY,
+      subject: process.env.VAPID_SUBJECT,
+    };
+  console.log(vapidDetails);
+});
+
+webpush.setVapidDetails(
+  "mailto:vasilievpavel795@gmail.com",
+  vapidDetails.publicKey,
+  vapidDetails.privateKey
+);
+
+const notification = JSON.stringify({
+  title: "Hello, Notifications123!",
+  options: {
+    body: `ID: ${Math.floor(Math.random() * 100)}`,
+  },
+});
+
+const options = {
+  TTL: 10000,
+  vapidDetails: vapidDetails,
+};
 
 const VAPID_PUBLIC_KEY =
   "BCTduvE5Ivvju-WFQY7OCcaY4hm-loWHzfnnK14SQG2jFQti-owRbN0Ntpi-k-rNa9kb7M-SFqwGluvJA_-R97Q";
 const notificationPermission = ref("default"); // Инициализируем с 'default' или другим подходящим значением
 const deviceInfo = ref({});
 let subscription;
+
 watchEffect(async () => {
   //   if (user.value) {
   //     if (data.value) {
@@ -74,11 +104,14 @@ const sendUserNotification = async () => {
 
   if (!activeSubscription) throw new Error("No active subscription found");
   console.log(activeSubscription);
+  const pushSubscription = JSON.parse(subscription);
+  console.log("pushSubscription1", pushSubscription);
+  await webpush.sendNotification(pushSubscription, notification, options);
 
-  await $fetch("/api/notification/sendNotification", {
-    method: "POST",
-    body: subscription,
-  });
+  // await $fetch("/api/notification/sendNotification", {
+  //   method: "POST",
+  //   body: subscription,
+  // });
 };
 const requestNotificationPermission = async () => {
   if (!("Notification" in window)) {
