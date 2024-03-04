@@ -14,8 +14,9 @@ webpush.setVapidDetails(
 
 export default defineEventHandler(async (event) => {
   try {
-    const pushSubscription = JSON.parse(readBody(event));
     const tempData = await readBody(event);
+    const pushSubscription = JSON.parse(tempData);
+
     const notification = JSON.stringify({
       title: "Hello, Notifications123!",
       options: {

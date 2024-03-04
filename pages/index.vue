@@ -52,22 +52,6 @@ watchEffect(async () => {
             applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY),
           });
           console.log("Subscription:", subscription);
-          //   if (user.value) {
-          //     await $fetch("/api/notification/addSubscription", {
-          //       method: "POST",
-          //       headers: {
-          //         "Content-Type": "application/json",
-          //       },
-          //       body: [
-          //         {
-          //           user_id: user.value.id,
-          //           endpoint: subscription,
-          //           device: deviceInfo.value.os,
-          //           browser: deviceInfo.value.browser,
-          //         },
-          //       ],
-          //     });
-          //   }
         }
       } catch (error) {
         console.error("Error during service worker registration:", error);
@@ -81,24 +65,6 @@ watchEffect(async () => {
 });
 
 const sendUserNotification = async () => {
-  // if (!user.value) return;
-  // const { data: subscriptionData } = await useFetch(
-  //   `/api/notification/getSubscriptions/query?userId=${user.value.id}&browser=${deviceInfo.value.browser}&os=${deviceInfo.value.os}`
-  // );
-  // if (!subscriptionData.value) {
-  //   throw new Error("No subscription data available");
-  // }
-  // const subscriptionDetails = JSON.parse(
-  //   subscriptionData.value.data[0].endpoint
-  // );
-
-  // const notificationPayload = {
-  //   endpoint: subscriptionDetails.endpoint,
-  //   keys: {
-  //     p256dh: subscriptionDetails.keys.p256dh,
-  //     auth: subscriptionDetails.keys.auth,
-  //   },
-  // };
   const serviceWorkerRegistration =
     await navigator.serviceWorker.getRegistration();
   if (!serviceWorkerRegistration)
