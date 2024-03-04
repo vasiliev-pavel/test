@@ -79,13 +79,13 @@ const sendUserNotification = async () => {
   console.log(activeSubscription.getKey("auth"));
   const p256dh = arrayBufferToBase64(activeSubscription.getKey("p256dh"));
   const auth = arrayBufferToBase64(activeSubscription.getKey("auth"));
-  const notificationPayload = {
+  const notificationPayload = JSON.stringify({
     endpoint: activeSubscription.endpoint,
     keys: {
       p256dh: p256dh,
       auth: auth,
     },
-  };
+  });
 
   console.log(notificationPayload);
   await $fetch("/api/notification/sendNotification", {
