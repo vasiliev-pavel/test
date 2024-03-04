@@ -15,8 +15,7 @@ webpush.setVapidDetails(
 export default defineEventHandler(async (event) => {
   try {
     const tempData = await readBody(event);
-    const pushSubscription = JSON.parse(tempData);
-    console.log(pushSubscription);
+    console.log(tempData);
     const notification = JSON.stringify({
       title: "Hello, Notifications123!",
       options: {
@@ -28,7 +27,7 @@ export default defineEventHandler(async (event) => {
       vapidDetails: vapidDetails,
     };
     // Отправка уведомления
-    await webpush.sendNotification(pushSubscription, notification, options);
+    await webpush.sendNotification(tempData, notification, options);
     // console.log(subscription);
     console.log("success");
     return { success: true };

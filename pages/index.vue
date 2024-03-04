@@ -80,7 +80,14 @@ const sendUserNotification = async () => {
 
   await $fetch("/api/notification/sendNotification", {
     method: "POST",
-    body: subscription,
+    body: {
+      endpoint: activeSubscription.endpoint,
+      expirationTime: activeSubscription.expirationTime,
+      keys: {
+        p256dh: activeSubscription.getKey("p256dh"),
+        auth: activeSubscription.getKey("auth"),
+      },
+    },
   });
 };
 const requestNotificationPermission = async () => {
