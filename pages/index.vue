@@ -77,14 +77,16 @@ const sendUserNotification = async () => {
   console.log(activeSubscription);
   console.log(activeSubscription.getKey("p256dh"));
   console.log(activeSubscription.getKey("auth"));
-
+  const p256dh = arrayBufferToBase64(activeSubscription.getKey("p256dh"));
+  const auth = arrayBufferToBase64(activeSubscription.getKey("auth"));
   const notificationPayload = {
     endpoint: activeSubscription.endpoint,
     keys: {
-      p256dh: activeSubscription.getKey("p256dh"),
-      auth: activeSubscription.getKey("auth"),
+      p256dh: p256dh,
+      auth: auth,
     },
   };
+
   console.log(notificationPayload);
   await $fetch("/api/notification/sendNotification", {
     method: "POST",
@@ -103,6 +105,15 @@ const requestNotificationPermission = async () => {
     console.error("Error requesting notification permission:", error);
   }
 };
+function arrayBufferToBase64(buffer) {
+  let binary = "";
+  let bytes = new Uint8Array(buffer);
+  let len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+}
 </script>
 
 <style></style>
