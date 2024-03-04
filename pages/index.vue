@@ -78,16 +78,17 @@ const sendUserNotification = async () => {
   console.log(activeSubscription.getKey("p256dh"));
   console.log(activeSubscription.getKey("auth"));
 
+  const notificationPayload = {
+    endpoint: activeSubscription.endpoint,
+    keys: {
+      p256dh: activeSubscription.getKey("p256dh"),
+      auth: activeSubscription.getKey("auth"),
+    },
+  };
+  console.log(notificationPayload);
   await $fetch("/api/notification/sendNotification", {
     method: "POST",
-    body: {
-      endpoint: activeSubscription.endpoint,
-      expirationTime: activeSubscription.expirationTime,
-      keys: {
-        p256dh: activeSubscription.getKey("p256dh"),
-        auth: activeSubscription.getKey("auth"),
-      },
-    },
+    body: notificationPayload,
   });
 };
 const requestNotificationPermission = async () => {
