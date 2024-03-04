@@ -18,11 +18,14 @@
 <script setup>
 import { urlB64ToUint8Array } from "~/composables/urlB64ToUint8Array";
 
+const { data } = await useFetch("/api/business");
 const VAPID_PUBLIC_KEY =
   "BCTduvE5Ivvju-WFQY7OCcaY4hm-loWHzfnnK14SQG2jFQti-owRbN0Ntpi-k-rNa9kb7M-SFqwGluvJA_-R97Q";
 const notificationPermission = ref("default"); // Инициализируем с 'default' или другим подходящим значением
 const deviceInfo = ref({});
-
+onMounted(() => {
+  //   deviceInfo.value = detectDeviceInfo();
+});
 watchEffect(async () => {
   //   if (user.value) {
   //     if (data.value) {
