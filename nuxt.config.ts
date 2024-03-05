@@ -3,6 +3,10 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   devServer: {
     host: "0.0.0.0",
+    https: {
+      key: "cert.key", // Укажите путь к вашему ключу
+      cert: "cert.crt", // Укажите путь к вашему сертификату
+    },
   },
   modules: ["@vite-pwa/nuxt"],
   pwa: {

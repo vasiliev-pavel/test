@@ -1,3 +1,17 @@
+import webpush from "web-push";
+
+const vapidDetails = {
+  publicKey: process.env.VAPID_PUBLIC_KEY,
+  privateKey: process.env.VAPID_PRIVATE_KEY,
+  subject: process.env.VAPID_SUBJECT,
+};
+
+webpush.setVapidDetails(
+  vapidDetails.subject,
+  vapidDetails.publicKey,
+  vapidDetails.privateKey
+);
+
 export default defineEventHandler(async (event) => {
   try {
     const tempData = await readBody(event);
