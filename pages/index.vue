@@ -65,34 +65,49 @@ watchEffect(async () => {
 });
 
 const sendUserNotification = async () => {
-  const serviceWorkerRegistration =
-    await navigator.serviceWorker.getRegistration();
-  if (!serviceWorkerRegistration)
-    throw new Error("Service Worker registration not found");
-  const activeSubscription =
-    await serviceWorkerRegistration.pushManager.getSubscription();
+  try {
+    const serviceWorkerRegistration =
+      await navigator.serviceWorker.getRegistration();
+    if (!serviceWorkerRegistration)
+      throw new Error("Service Worker registration not found");
 
-  if (!activeSubscription) throw new Error("No active subscription found");
+    const activeSubscription =
+      await serviceWorkerRegistration.pushManager.getSubscription();
+    if (!activeSubscription) throw new Error("No active subscription found");
 
-  console.log(activeSubscription);
-  console.log(activeSubscription.getKey("p256dh"));
-  console.log(activeSubscription.getKey("auth"));
-  const p256dh = arrayBufferToBase64(activeSubscription.getKey("p256dh"));
-  const auth = arrayBufferToBase64(activeSubscription.getKey("auth"));
-  const notificationPayload = JSON.stringify({
-    endpoint: activeSubscription.endpoint,
-    keys: {
-      p256dh: p256dh,
-      auth: auth,
-    },
-  });
+    const p256dh = arrayBufferToBase64(activeSubscription.getKey("p256dh"));
+    const auth = arrayBufferToBase64(activeSubscription.getKey("auth"));
+    const notificationPayload = JSON.stringify({
+      endpoint: activeSubscription.endpoint,
+      keys: {
+        p256dh: p256dh,
+        auth: auth,
+      },
+    });
 
-  console.log(notificationPayload);
-  await $fetch("/api/notification/sendNotification", {
-    method: "POST",
-    body: notificationPayload,
-  });
+    const response = await $fetch("/api/notification/sendNotification", {
+      method: "POST",
+      body: notificationPayload,
+    });
+
+    if (!response.success) {
+      // Обработка случая, когда сервер вернул ошибку
+      console.error("Error sending notification:", response.error);
+      alert("Error sending notification. Please try again.");
+    } else {
+      // Уведомление успешно отправлено
+      console.log("Notification sent successfully.");
+      alert("Notification sent successfully!");
+    }
+  } catch (error) {
+    // Обработка ошибок, например, ошибок сети или JSON-парсинга
+    console.error("Error sending notification:", error);
+    alert(
+      "Failed to send notification. Please check your connection and try again."
+    );
+  }
 };
+
 const requestNotificationPermission = async () => {
   if (!("Notification" in window)) {
     console.error("This browser does not support desktop notification");
@@ -105,6 +120,7 @@ const requestNotificationPermission = async () => {
     console.error("Error requesting notification permission:", error);
   }
 };
+
 function arrayBufferToBase64(buffer) {
   let binary = "";
   let bytes = new Uint8Array(buffer);
